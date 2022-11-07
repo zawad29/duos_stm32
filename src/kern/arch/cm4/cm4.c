@@ -404,7 +404,7 @@ uint32_t __get_PRIMASK(void) {
 }
 
 void __set_BASEPRI(uint32_t value) {
-    value = value & 0xF;
+    value = (value << 4) & 0xFF;
     asm volatile ("MSR basepri, %0" : : "r" (value));
 }
 
@@ -416,7 +416,7 @@ void __unset_BASEPRI(void) {
 uint32_t __get_BASEPRI(void) {
     uint32_t value = 99;
     asm volatile ("MRS %0, basepri" : "=r" (value));
-    return value;
+    return (value >> 4);
 }
 
 void __set_FAULTMASK(uint32_t value) {
@@ -431,4 +431,3 @@ void __disable_fault_irq(void) {
 void __enable_fault_irq(void) {
     asm volatile ("CPSIE F");
 }
-
