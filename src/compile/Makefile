@@ -70,7 +70,11 @@ asst03: $(OBJECT)/kmath.o $(OBJECT)/kfloat.o  $(OBJECT)/cm4.o $(OBJECT)/kstring.
 clean:
 	rm -rf $(OBJECT)/*.o $(MAPDIR)/*.map $(TARGET)/* *.o *.elf
 
+
 # To Students -- Modify to match with the appropriate driver file.
+BOARDCFG = /usr/share/openocd/scripts/board/stm32f4discovery.cfg
+STLINKCFG = /usr/share/openocd/scripts/interface/stlink.cfg
+
 load:
-	openocd -f /usr/share/openocd/scripts/board/stm32f4discovery.cfg -f /usr/share/openocd/scripts/interface/stlink.cfg -c "program target/asst03 verify reset exit"
+	openocd -f $(BOARDCFG) -f $(STLINKCFG) -c "program target/asst03 verify reset exit"
 
