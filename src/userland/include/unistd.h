@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 
+ * Copyright (c) 2022
  * Computer Science and Engineering, University of Dhaka
  * Credit: CSE Batch 25 (starter) and Prof. Mosaddek Tushar
  *
@@ -27,9 +27,20 @@
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
- 
+
 #ifndef __UNISTD_H
 #define __UNISTD_H
-/* Basic input and output function */
+ /* Basic input and output function */
+
+#include <stm32_peps.h>
+#include <usart.h>
+#include <kstring.h>
+#include <stdint.h>
+#include <stdarg.h>
+#include <kunistd.h>
+
+
+void printf(char*, ...);
+void scanf(char*, ...);
 
 #endif

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 
+ * Copyright (c) 2022
  * Computer Science and Engineering, University of Dhaka
  * Credit: CSE Batch 25 (starter) and Prof. Mosaddek Tushar
  *
@@ -30,9 +30,20 @@
 
 #ifndef __KERN_UNISTD_H
 #define __KERN_UNISTD_H
-/* Constants for read/write/etc: special file handles */
+ /* Constants for read/write/etc: special file handles */
 #define STDIN_FILENO  0      /* Standard input */
 #define STDOUT_FILENO 1      /* Standard output */
 #define STDERR_FILENO 2      /* Standard error */
-#endif /* KERN_UNISTD_H */
 
+#include <stdint.h>
+#include <syscall_def.h>
+#include <usart.h>
+#include <cm4.h>
+
+void write(uint8_t fd, uint8_t* data, uint16_t size);
+void read(uint8_t fd, uint8_t* data, uint16_t size);
+
+void __sys_read(unsigned int* args);
+void __sys_write(unsigned int* args);
+void __sys_reboot(void);
+#endif /* KERN_UNISTD_H */

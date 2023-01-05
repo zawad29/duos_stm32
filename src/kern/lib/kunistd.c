@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 
+ * Copyright (c) 2022
  * Computer Science and Engineering, University of Dhaka
  * Credit: CSE Batch 25 (starter) and Prof. Mosaddek Tushar
  *
@@ -28,5 +28,42 @@
  * SUCH DAMAGE.
  */
 #include <kunistd.h>
-/* Add your functions here */
+ /* Add your functions here */
 
+
+void write(uint8_t fd, uint8_t* data, uint16_t size) {
+    asm("SVC %0" :: "I"(SYS_write));
+}
+void read(uint8_t fd, uint8_t* data, uint16_t size) {
+    asm("SVC %0" :: "I"(SYS_read));
+}
+
+void __sys_write(unsigned int* args) {
+    uint8_t fd = (uint8_t)args[0];
+    uint8_t* data = (uint8_t*)args[1];
+    uint16_t size = (uint16_t)args[2];
+    if (fd == STDOUT_FILENO) {
+        _USART_WRITE(USART2, data);
+    }
+}
+
+void __sys_read(unsigned int* args) {
+    uint8_t fd = (uint8_t)args[0];
+    uint8_t* data = (uint8_t*)args[1];
+    uint16_t size = (uint16_t)args[2];
+    if (fd == STDIN_FILENO) {
+        _USART_READ(USART2, data, size);
+    }
+
+}
+
+void __sys_reboot() {
+    SCB->AIRCR = (0x5FA << 16) | (1 << 2); //system reset test
+    for (;;) {}
+}
+
+void __sys_setTaskStatus() {}
+
+void __sys_getpid() {}
+
+void __sys_getTime() {}

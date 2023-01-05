@@ -74,11 +74,27 @@ void _USART_WRITE(USART_TypeDef* usart, uint8_t* s)
 	while (*s) UART_SendChar(usart, *s++);
 }
 /*****Modify according to your need *****/
+// uint8_t _USART_READ(USART_TypeDef* usart, uint8_t* buff, uint16_t size)
+// {
+// 	uint8_t n = 0;
+// 	for (uint8_t i = 0;i < size;i++) {
+// 		buff[i] = UART_GetChar(usart);
+// 		if (i == 0 && buff[i] != 0x03F) { continue; }
+// 		n = i;
+// 	}
+// 	return n;
+// }
 uint8_t _USART_READ(USART_TypeDef* usart, uint8_t* buff, uint16_t size)
 {
 	uint8_t n = 0;
 	for (uint8_t i = 0;i < size;i++) {
 		buff[i] = UART_GetChar(usart);
+		//if get cr+lf
+		if (i > 1 && buff[i] == '\n' && buff[i - 1] == '\r') {
+			n = i - 1;
+			buff[i - 1] = 0;
+			break;
+		}
 		if (i == 0 && buff[i] != 0x03F) { continue; }
 		n = i;
 	}
