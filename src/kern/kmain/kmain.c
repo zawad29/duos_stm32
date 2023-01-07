@@ -36,6 +36,8 @@
 #include <stdint.h>
 #include <usart.h>
 #include <syscall_def.h>
+#include <unistd.h>
+#include <thread.h>
  //#include "../include/float.h"
 
 
@@ -55,12 +57,11 @@ void kmain(void)
 	float x = 50.59;
 	uint8_t y = 23, f = 56;
 	// x++;
-	kprintf("%d %d %f\n", y, f, x);
-	kprintf("After Input\n");
+	printf("%d %d %f\n", y, f, x);
 	uint8_t p[8] = "1234.34\0";
 	x = str2float(p);
 	printf("After Input: x=%f\n", x);
-	kprintf("Time Elapse %d ms\n", __getTime());
+	// printf("Time Elapsed %d ms\n", getTime());
 
 	// __disable_irq();
 	// status = __get_PRIMASK();
@@ -75,28 +76,30 @@ void kmain(void)
 
 	uint32_t ssssdas = 4545;
 
-	// asm("SVC #50");
 	printf("hello\n");
 
-	printf("%s", "everyone\n");
+	printf("%s\n", "everyone");
 
+	printf("Time Elapsed %d ms\n", getTime());
 
 	for (int i = 0; i < 10; i++) {
-		kprintf("%d", i);
+		printf("%d", i);
 	}
 
 	int llsds;
-	scanf("%d", &llsds);
+	uint8_t strr[20];
+	scanf("%d ", &llsds);
+	scanf("%s", strr);
+	printf("%s\n", strr);
 	printf("llsd = %d\n", llsds);
 
-	// uint8_t* pqpqp;
-	// kscanf("%s", pqpqp);
-	// printf("%s\n", pqpqp);
 	printf("end\n");
+	printf("Time Elapsed %d ms\n", getTime());
 
-	asm("SVC %0" :: "I"(SYS_reboot));
+	// _thread_demo();
 
-	kprintf("system reset...");
+	reboot();
+
 
 	while (1) {
 		//	kprintf((uint8_t*)"%d",(uint8_t*)a);

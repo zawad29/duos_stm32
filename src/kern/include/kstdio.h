@@ -36,8 +36,8 @@
 
 void kprintf(char*, ...);
 void kscanf(char*, ...);
-void printf(char*, ...);
-void scanf(char*, ...);
+// void printf(char*, ...);
+// void scanf(char*, ...);
 uint8_t strcomp(uint8_t*, uint8_t*);
 #endif /* KSTDIO */
 

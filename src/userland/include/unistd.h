@@ -31,16 +31,15 @@
 #ifndef __UNISTD_H
 #define __UNISTD_H
  /* Basic input and output function */
-
-#include <stm32_peps.h>
-#include <usart.h>
-#include <kstring.h>
-#include <stdint.h>
-#include <stdarg.h>
-#include <kunistd.h>
-
+#include<stdint.h>
 
 void printf(char*, ...);
 void scanf(char*, ...);
+
+void reboot(void);
+void exit(void);
+void yield(void);
+uint32_t getpid(void);
+uint32_t getTime(void);
 
 #endif

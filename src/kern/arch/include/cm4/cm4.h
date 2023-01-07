@@ -280,7 +280,8 @@ void __enable_fault_irq(void);
 
 void __disable_fault_irq(void);
 
-
+//define svc call number "n"
+#define __svc(n) asm volatile("SVC %0" :: "I"(n)) 
 
 
 #endif

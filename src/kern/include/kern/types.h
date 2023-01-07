@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 
+ * Copyright (c) 2022
  * Computer Science and Engineering, University of Dhaka
  * Credit: CSE Batch 25 (starter) and Prof. Mosaddek Tushar
  *
@@ -30,13 +30,15 @@
 
 #ifndef __TYPES_H
 #define __TYPES_H
-/*
-* Task, thread or process header
-*/
-typedef struct task_tcb{
+
+#include <stdint.h>
+ /*
+ * Task, thread or process header
+ */
+typedef struct task_tcb {
 	uint32_t magic_number; //here it is 0xFECABAA0
 	uint16_t task_id; //a unsigned 16 bit integer starting from 1000 
-	void *psp; //task stack pointer or stackframe address
+	void* psp; //task stack pointer or stackframe address
 	uint16_t status; //task status: running, waiting, ready, killed, or terminated
 	uint32_t execution_time; //total execution time (in ms)
 	uint32_t waiting_time; //total waiting time (in ms)

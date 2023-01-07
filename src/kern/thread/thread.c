@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 
+ * Copyright (c) 2022
  * Computer Science and Engineering, University of Dhaka
  * Credit: CSE Batch 25 (starter) and Prof. Mosaddek Tushar
  *
@@ -30,3 +30,7 @@
 #include <types.h> 
 #include <thread.h>
 
+void _thread_demo(void) {
+    int i = 0;
+    while (i < 10) i++;
+}

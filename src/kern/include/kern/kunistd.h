@@ -46,4 +46,5 @@ void read(uint8_t fd, uint8_t* data, uint16_t size);
 void __sys_read(unsigned int* args);
 void __sys_write(unsigned int* args);
 void __sys_reboot(void);
+void __sys_getTime(unsigned int* args);
 #endif /* KERN_UNISTD_H */

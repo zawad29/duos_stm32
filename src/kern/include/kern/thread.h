@@ -27,48 +27,12 @@
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
-#include <kunistd.h>
- /* Add your functions here */
+
+#ifndef __THREAD_H
+#define __THREAD_H
 
 
-void write(uint8_t fd, uint8_t* data, uint16_t size) {
-    // asm("SVC %0" :: "I"(SYS_write));
-    __svc(SYS_write);
-}
-void read(uint8_t fd, uint8_t* data, uint16_t size) {
-    // asm("SVC %0" :: "I"(SYS_read));
-    __svc(SYS_read);
-}
+void _thread_demo(void);
 
-void __sys_write(unsigned int* args) {
-    uint8_t fd = (uint8_t)args[0];
-    uint8_t* data = (uint8_t*)args[1];
-    uint16_t size = (uint16_t)args[2];
-    if (fd == STDOUT_FILENO) {
-        _USART_WRITE(USART2, data);
-    }
-}
 
-void __sys_read(unsigned int* args) {
-    uint8_t fd = (uint8_t)args[0];
-    uint8_t* data = (uint8_t*)args[1];
-    uint16_t size = (uint16_t)args[2];
-    if (fd == STDIN_FILENO) {
-        _USART_READ(USART2, data, size);
-    }
-
-}
-
-void __sys_reboot() {
-    SCB->AIRCR = (0x5FA << 16) | (1 << 2); //system reset 
-    for (;;) {}
-}
-
-void __sys_setTaskStatus() {}
-
-void __sys_getpid() {}
-
-void __sys_getTime(unsigned int* args) {
-    uint32_t* t = args[0];
-    *t = __getTime();
-}
+#endif /* THREAD_H */

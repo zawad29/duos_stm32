@@ -56,6 +56,7 @@ void syscall(uint16_t callno, unsigned int* svc_args)
 	case SYS_getpid:
 		break;
 	case SYS___time:
+		__sys_getTime(svc_args);
 		break;
 	case SYS_yield:
 		break;
