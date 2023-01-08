@@ -32,6 +32,7 @@
 #include <clock.h>
 #include <syscall.h>
 #include <kstdio.h>
+#include <kmain.h>
 volatile static uint32_t __mscount;
 
 /************************************************************************************
@@ -97,32 +98,40 @@ __attribute__((weak)) uint32_t __getTime(void)
 __attribute__((weak)) void SysTick_Handler()
 {
     __mscount += (SYSTICK->LOAD) / (PLL_N * 1000);
-
     // // // TODO: add task switchng
     extern uint32_t curr_task;
     extern uint32_t next_task;
-    switch (curr_task) {
-    case(0):
-        next_task = 1;
-        break;
-    case(1):
-        next_task = 2;
-        break;
-    case(2):
-        next_task = 3;
-        break;
-    case(3):
-        next_task = 0;
-        break;
-    default:
-        next_task = 0;
-        break;
+    extern TCB_TypeDef TCB[];
+    // switch (curr_task) {
+    // case(0):
+    //     next_task = 1;
+    //     break;
+    // case(1):
+    //     next_task = 2;
+    //     break;
+    // case(2):
+    //     next_task = 3;
+    //     break;
+    // case(3):
+    //     next_task = 0;
+    //     break;
+    // default:
+    //     next_task = 0;
+    //     break;
+    // }
+    next_task = curr_task;
+    for (int i = 0; i < MAX_TASKS; i++) {
+        next_task = (next_task + 1) % MAX_TASKS;
+        if (TCB[next_task].status == TASK_READY_STATE) break;
     }
-
+    if (TCB[next_task].status == TASK_BLOCKED_STATE) {
+        __svc(SYS_reboot);
+    }
     if (curr_task != next_task) { // Context switching needed
         __SetPendSV();
     }
     // kprintf("%d %d ", curr_task, next_task);
+    // __SetPendSV();
     return;
 }
 

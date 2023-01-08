@@ -48,13 +48,26 @@ void reboot(void) {
 uint32_t getTime() {
     uint32_t t;
     uint32_t t_ptr = (uint32_t)&t;
-    __asm volatile("MOV R0, %0" : : "r" (t_ptr) : );
+    asm volatile("MOV R0, %0" : : "r" (t_ptr) : );
     __svc(SYS___time);
     return t;
 }
 
 uint32_t getpid(void) {
-    return 69;
+    uint32_t pid;
+    uint32_t pid_ptr = (uint32_t)&pid;
+    asm volatile("MOV R0, %0" : : "r" (pid_ptr) : );
+    __svc(SYS_getpid);
+    return pid;
+    // return 69;
+}
+
+void yield(void) {
+    __svc(SYS_yield);
+}
+
+void exit(void) {
+    __svc(SYS__exit);
 }
 
 // static char buffer[255];

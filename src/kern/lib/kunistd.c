@@ -29,7 +29,9 @@
  */
 #include <kunistd.h>
  /* Add your functions here */
-
+extern TCB_TypeDef TCB[];
+extern uint32_t curr_task;
+extern uint32_t next_task;
 
 void write(uint8_t fd, uint8_t* data, uint16_t size) {
     // asm("SVC %0" :: "I"(SYS_write));
@@ -64,17 +66,23 @@ void __sys_reboot() {
     for (;;) {}
 }
 
-void __sys_setTaskStatus() {}
-
-void __sys_getpid() {
-
-}
-
 void __sys_getTime(unsigned int* args) {
     uint32_t* t = args[0];
     *t = __getTime();
 }
 
-void __sys_exit(void) {
 
+void __sys_getpid(unsigned int* args) {
+    uint32_t* pid = args[0];
+    // *pid = (TCB + curr_task)->task_id;
+    *pid = TCB[curr_task].task_id;
+}
+
+void __sys_exit(void) {
+    TCB[curr_task].status = 0XFF;
+    __sys_yield();
+}
+
+void __sys_yield(void) {
+    __SetPendSV();
 }

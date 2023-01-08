@@ -48,7 +48,7 @@
 uint32_t curr_task;
 uint32_t next_task;
 uint32_t main_stack[1024], task0_stack[1024], task1_stack[1024], task2_stack[1024], task3_stack[1024];
-TCB_TypeDef TCB[5];
+TCB_TypeDef TCB[MAX_TASKS];	// Ready Queue for multitasking
 uint32_t* PSP_Array[MAX_TASKS];
 static uint32_t count = 0;
 #define MAX_COUNT 10000000
@@ -74,7 +74,7 @@ void kmain(void)
 
 	thread_init();		// context switching demo 
 
-	// demo_svc();		// svc call demo
+	// demo_svc();		// svc call demo, change PendSV_Handler to blank
 
 	while (1);
 
@@ -113,51 +113,100 @@ void demo_svc(void) {
 // }
 
 void thread_init() {
-	PSP_Array[0] = &task0_stack[1023];
-	*(PSP_Array[0] - 1) = 0x01000000;
-	*(PSP_Array[0] - 2) = task0;
-	PSP_Array[0] = &task0_stack[1023] - 16;
+	// initialize TCB
+	for (int i = 0; i < MAX_TASKS; i++) {
+		TCB[i].digital_sinature = 0x00000001;
+		TCB[i].execution_time = 0;
+		TCB[i].waiting_time = 0;
+		TCB[i].magic_number = 0xFECABAA0;
+		TCB[i].status = TASK_READY_STATE;
+		TCB[i].task_id = 1000 + i;
+	}
+	/***************************************************/
+	// PSP_Array[0] = &task0_stack[1023];
+	// *(PSP_Array[0] - 1) = 0x01000000;
+	// *(PSP_Array[0] - 2) = task0;
+	// PSP_Array[0] = &task0_stack[1023] - 16;
 
-	PSP_Array[1] = &task1_stack[1023];
-	*(PSP_Array[1] - 1) = 0x01000000;
-	*(PSP_Array[1] - 2) = task1;
-	PSP_Array[1] = &task1_stack[1023] - 16;
+	TCB[0].psp = &task0_stack[1023] - 16;
+	*(TCB[0].psp + 14) = task0;
+	*(TCB[0].psp + 15) = DUMMY_XPSR;
 
-	PSP_Array[2] = &task2_stack[1023];
-	*(PSP_Array[2] - 1) = 0x01000000;
-	*(PSP_Array[2] - 2) = task2;
-	PSP_Array[2] = &task2_stack[1023] - 16;
+	/**************************************************/
+	// PSP_Array[1] = &task1_stack[1023];
+	// *(PSP_Array[1] - 1) = 0x01000000;
+	// *(PSP_Array[1] - 2) = task1;
+	// PSP_Array[1] = &task1_stack[1023] - 16;
 
-	PSP_Array[3] = &task3_stack[1023];
-	*(PSP_Array[3] - 1) = 0x01000000;
-	*(PSP_Array[3] - 2) = task3;
-	PSP_Array[3] = &task3_stack[1023] - 16;
+	TCB[1].psp = &task1_stack[1023] - 16;
+	*(TCB[1].psp + 14) = task1;
+	*(TCB[1].psp + 15) = DUMMY_XPSR;
 
-	// initialize with task 0
+	/*************************************************/
+	// PSP_Array[2] = &task2_stack[1023];
+	// *(PSP_Array[2] - 1) = 0x01000000;
+	// *(PSP_Array[2] - 2) = task2;
+	// PSP_Array[2] = &task2_stack[1023] - 16;
+
+	TCB[2].psp = &task2_stack[1023] - 16;
+	*(TCB[2].psp + 14) = task2;
+	*(TCB[2].psp + 15) = DUMMY_XPSR;
+
+	/**************************************************/
+	// PSP_Array[3] = &task3_stack[1023];
+	// *(PSP_Array[3] - 1) = 0x01000000;
+	// *(PSP_Array[3] - 2) = task3;
+	// PSP_Array[3] = &task3_stack[1023] - 16;
+
+	TCB[3].psp = &task3_stack[1023] - 16;
+	*(TCB[3].psp + 14) = task3;
+	*(TCB[3].psp + 15) = DUMMY_XPSR;
+
+	/****************************************************/
+
+		// initialize with task 0
 	curr_task = 0;
-	__asm volatile("MSR PSP, %0" : : "r" (PSP_Array[curr_task]) : );
+	// __asm volatile("MSR PSP, %0" : : "r" (PSP_Array[curr_task]) : );
+	//TODO: switch psp_array to ready_queue TCB
+	__asm volatile("MSR PSP, %0" : : "r" (TCB[curr_task].psp) : );
 	__sysTick_enable();
 	__set_control(3);
+
+	int llsds;
+	uint8_t strr[50];
+	printf("input an integer: ");
+	scanf("%d ", &llsds);
+	printf("llsd = %d\n", llsds);
+	printf("input a string: ");
+	scanf("%s", strr);
+	printf("%s\n", strr);
+	printf("end of svc demo...\n");
+	printf("starting multitasking demo...\n");
+	printf("Time Elapsed %d ms\n", getTime());
 	task0();
+	printf("end of tasks\n");
 }
 
-
+//TODO: change pendsv handler to blank for SVC demo.
 __attribute__((naked)) void PendSV_Handler(void)
 {
 	// Save current context
 	__asm volatile("MRS R0, PSP"); // Get current process stack pointer value
 	__asm volatile("STMDB R0!, {R4-R11}"); // Save R4 to R11 in task stack (8 regs) Other registers auto pushed by uC
 	__asm volatile("LDR R2, [%0]" : : "r" (&curr_task) : ); // Get current task ID
-	__asm volatile("STR R0, [%0]" : : "r" (&PSP_Array[curr_task]) : ); // Save PSP of curr_task into PSP_array
+	// __asm volatile("STR R0, [%0]" : : "r" (&PSP_Array[curr_task]) : ); // Save PSP of curr_task into PSP_array
+	__asm volatile("STR R0, [%0]" : : "r" (&TCB[curr_task].psp) : ); // Save PSP of curr_task into PSP_array
 	// Load next context
+	// next_task = (curr_task + 1) % MAX_TASKS;
 	__asm volatile("LDR R4, [%0]" : : "r" (&next_task) : ); // Get next task ID
 	__asm volatile("STR R4, [%0]" : : "r" (&curr_task) : ); // Set curr_task = next_task
-	__asm volatile("LDR R0, [%0]" : : "r" (&PSP_Array[next_task]) : ); // Load PSP value from PSP_array
+	// __asm volatile("LDR R0, [%0]" : : "r" (&PSP_Array[next_task]) : ); // Load PSP value from PSP_array
+	__asm volatile("LDR R0, [%0]" : : "r" (&TCB[next_task].psp) : ); // Load PSP value from PSP_array
 	__asm volatile("LDMIA R0!, {R4-R11}"); // Load R4 to R11 from task stack (8 regs) Other registers auto poped by uC
 	__asm volatile("MSR PSP, R0"); // Set PSP to next task
 	__asm volatile("BX LR");
 }
-
+/**/
 // void PendSV_Handler(void) {}
 
 
@@ -180,6 +229,7 @@ void task0(void)
 		value++;
 		if (value != count + 1) { // we check is if some other task(s) increased the count
 			printf("Error %d != %d\n", value, count + 1); /* It is an SVC call*/
+			exit();
 		}
 		else {
 			count = value;
@@ -187,14 +237,16 @@ void task0(void)
 		}
 		if (count >= MAX_COUNT) {
 			/* display how many increments it has successfully done!! */
-			// uint16_t task_id = getpid(); /* It is an SVC call*/
-			uint16_t task_id = 1000 + curr_task;
+			uint16_t task_id = getpid(); /* It is an SVC call*/
+			// uint16_t task_id = 1000 + curr_task;
 			printf("Total increment done by task %d is: %d\n", task_id, inc_count);
+			printf("Task %d Time Elapsed %d ms\n", task_id, getTime());
 			break;
 		}
 		// printf("Task 0: Time Elapsed %d ms\n", getTime());
 
 	}
+	exit();
 	while (1);
 }
 
@@ -207,6 +259,7 @@ void task1(void)
 		value++;
 		if (value != count + 1) { // we check is if some other task(s) increased the count
 			printf("Error %d != %d\n", value, count + 1); /* It is an SVC call*/
+			yield();
 		}
 		else {
 			count = value;
@@ -214,13 +267,14 @@ void task1(void)
 		}
 		if (count >= MAX_COUNT) {
 			/* display how many increments it has successfully done!! */
-			// uint16_t task_id = getpid(); /* It is an SVC call*/
-			uint16_t task_id = 1000 + curr_task;
+			uint16_t task_id = getpid(); /* It is an SVC call*/
+			// uint16_t task_id = 1000 + curr_task;
 			printf("Total increment done by task %d is: %d\n", task_id, inc_count);
+			printf("Task %d Time Elapsed %d ms\n", task_id, getTime());
 			break;
 		}
 		// printf("Task 1: Time Elapsed %d ms\n", getTime());
-	}
+	}exit();
 	while (1);
 }
 
@@ -233,6 +287,7 @@ void task2(void)
 		value++;
 		if (value != count + 1) { // we check is if some other task(s) increased the count
 			printf("Error %d != %d\n", value, count + 1); /* It is an SVC call*/
+			yield();
 		}
 		else {
 			count = value;
@@ -240,13 +295,14 @@ void task2(void)
 		}
 		if (count >= MAX_COUNT) {
 			/* display how many increments it has successfully done!! */
-			// uint16_t task_id = getpid(); /* It is an SVC call*/
-			uint16_t task_id = 1000 + curr_task;
+			uint16_t task_id = getpid(); /* It is an SVC call*/
+			// uint16_t task_id = 1000 + curr_task;
 			printf("Total increment done by task %d is: %d\n", task_id, inc_count);
+			printf("Task %d Time Elapsed %d ms\n", task_id, getTime());
 			break;
 		}
 		// printf("Task 2: Time Elapsed %d ms\n", getTime());
-	}
+	}exit();
 	while (1);
 }
 void task3(void)
@@ -258,6 +314,7 @@ void task3(void)
 		value++;
 		if (value != count + 1) { // we check is if some other task(s) increased the count
 			printf("Error %d != %d\n", value, count + 1); /* It is an SVC call*/
+			yield();
 		}
 		else {
 			count = value;
@@ -265,13 +322,14 @@ void task3(void)
 		}
 		if (count >= MAX_COUNT) {
 			/* display how many increments it has successfully done!! */
-			// uint16_t task_id = getpid(); /* It is an SVC call*/
-			uint16_t task_id = 1000 + curr_task;
+			uint16_t task_id = getpid(); /* It is an SVC call*/
+			// uint16_t task_id = 1000 + curr_task;
 			printf("Total increment done by task %d is: %d\n", task_id, inc_count);
+			printf("Task %d Time Elapsed %d ms\n", task_id, getTime());
 			break;
 		}
 		// printf("Task 3: Time Elapsed %d ms\n", getTime());
-	}
+	}exit();
 	while (1);
 }
 
