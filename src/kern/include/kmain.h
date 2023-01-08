@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 
+ * Copyright (c) 2022
  * Computer Science and Engineering, University of Dhaka
  * Credit: CSE Batch 25 (starter) and Prof. Mosaddek Tushar
  *
@@ -32,9 +32,9 @@
 #define __KMAIN_H
 
 
-#define MAX_TASKS   5
+ // #define MAX_TASKS   5
 
-/* some stack memory calculations */
+ /* some stack memory calculations */
 #define SIZE_TASK_STACK          1024U
 #define SIZE_SCHED_STACK         1024U
 
@@ -55,9 +55,12 @@
 #define SYSTICK_TIM_CLK   		HSI_CLOCK
 
 
+#define MAX_TASKS 4
+
 #define DUMMY_XPSR  0x01000000U
 
 #define TASK_READY_STATE  0x00
+#define TASK_RUNNING_STATE  0x01
 #define TASK_BLOCKED_STATE  0XFF
 
 #define INTERRUPT_DISABLE()  do{__asm volatile ("MOV R0,#0x1"); asm volatile("MSR PRIMASK,R0"); } while(0)

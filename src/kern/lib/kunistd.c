@@ -66,9 +66,15 @@ void __sys_reboot() {
 
 void __sys_setTaskStatus() {}
 
-void __sys_getpid() {}
+void __sys_getpid() {
+
+}
 
 void __sys_getTime(unsigned int* args) {
     uint32_t* t = args[0];
     *t = __getTime();
+}
+
+void __sys_exit(void) {
+
 }

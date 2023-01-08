@@ -30,7 +30,4 @@
 #include <types.h> 
 #include <thread.h>
 
-void _thread_demo(void) {
-    int i = 0;
-    while (i < 10) i++;
-}
+

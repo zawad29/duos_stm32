@@ -47,4 +47,7 @@ void __sys_read(unsigned int* args);
 void __sys_write(unsigned int* args);
 void __sys_reboot(void);
 void __sys_getTime(unsigned int* args);
+void __sys_getpid(void);
+void __sys_setTaskStatus(void);
+void __sys_exit(void);
 #endif /* KERN_UNISTD_H */

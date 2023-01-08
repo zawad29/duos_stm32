@@ -283,5 +283,11 @@ void __disable_fault_irq(void);
 //define svc call number "n"
 #define __svc(n) asm volatile("SVC %0" :: "I"(n)) 
 
+__attribute__((naked)) void __set_control(uint32_t val);
+
+void __SetPendSV(void);
+
+void __ClearPendSV(void);
+
 
 #endif

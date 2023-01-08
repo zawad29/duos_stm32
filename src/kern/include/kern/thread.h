@@ -32,7 +32,4 @@
 #define __THREAD_H
 
 
-void _thread_demo(void);
-
-
 #endif /* THREAD_H */

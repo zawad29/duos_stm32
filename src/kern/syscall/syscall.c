@@ -52,13 +52,16 @@ void syscall(uint16_t callno, unsigned int* svc_args)
 		__sys_reboot();
 		break;
 	case SYS__exit:
+		__sys_exit();
 		break;
 	case SYS_getpid:
+		__sys_getpid();
 		break;
 	case SYS___time:
 		__sys_getTime(svc_args);
 		break;
 	case SYS_yield:
+		// __SetPendSV();
 		break;
 		/* return error code see error.h and errmsg.h ENOSYS sys_errlist[ENOSYS]*/
 	default:;

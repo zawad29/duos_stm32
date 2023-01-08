@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022 
+ * Copyright (c) 2022
  * Computer Science and Engineering, University of Dhaka
  * Credit: CSE Batch 25 (starter) and Prof. Mosaddek Tushar
  *
@@ -27,7 +27,7 @@
  * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
  * SUCH DAMAGE.
  */
- 
+
 #include <sys_init.h>
 #include <cm4.h>
 #include <clock.h>
@@ -41,14 +41,18 @@ void __sys_init(void)
 	DRV_USART_INIT(USART2); //configure as standard input and output 
 	__enable_fpu(); //enable FPU single precision floating point unit
 	__SysTick_init(10000);	//enable systick for 10ms
+	// __sysTick_enable();
+	__NVIC_SetPriority(SysTick_IRQn, 0xff);
+	__NVIC_SetPriority(PendSV_IRQn, 0xff);
 	kprintf("\n************************************\r\n");
 	kprintf("Booting DUOS .....\r\n");
 	kprintf("Copyright (c) 2022, CSE, DU\r\n");
 	kprintf("Credit: Third Year 2022\r\n");
 	kprintf("CPUID %x\n", SCB->CPUID);
 	kprintf("OS Version: 1.0\n");
-	kprintf("Time Elapse %d ms\n",__getTime());
+	kprintf("Time Elapse %d ms\n", __getTime());
 	kprintf("Wellcome ....\r\n");
 	kprintf("*************************************\r\n");
 	kprintf("# ");
+
 }

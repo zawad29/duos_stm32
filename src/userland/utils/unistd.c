@@ -53,6 +53,10 @@ uint32_t getTime() {
     return t;
 }
 
+uint32_t getpid(void) {
+    return 69;
+}
+
 // static char buffer[255];
 // TODO: complete the printf func
 void printf(char* format, ...)

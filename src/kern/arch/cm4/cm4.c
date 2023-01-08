@@ -31,7 +31,9 @@
 #include <cm4.h>
 #include <clock.h>
 #include <syscall.h>
+#include <kstdio.h>
 volatile static uint32_t __mscount;
+
 /************************************************************************************
 * __SysTick_init(uint32_t reload)
 * Function initialize the SysTick clock. The function with a weak attribute enables
@@ -45,7 +47,7 @@ __attribute__((weak)) void __SysTick_init(uint32_t reload)
     __mscount = 0;
     SYSTICK->LOAD = PLL_N * reload - 1;
     SYSTICK->CTRL |= 1 << 1 | 1 << 2; //enable interrupt and internal clock source
-    SYSTICK->CTRL |= 1 << 0; //enable systick counter
+    // SYSTICK->CTRL |= 1 << 0; //enable systick counter
 }
 
 /************************************************************************************
@@ -55,11 +57,11 @@ __attribute__((weak)) void __SysTick_init(uint32_t reload)
 **************************************************************************************/
 __attribute__((weak)) void __sysTick_enable(void)
 {
-    if (SYSTICK->CTRL & ~(1 << 0)) SYSTICK->CTRL |= 1 << 0;
+    SYSTICK->CTRL |= 1 << 0;
 }
 __attribute__((weak)) void __sysTick_disable(void)
 {
-    if (!(SYSTICK->CTRL & ~(1 << 0))) SYSTICK->CTRL &= ~(1 << 0);
+    SYSTICK->CTRL &= ~(1 << 0);
 }
 __attribute__((weak)) uint32_t __getSysTickCount(void)
 {
@@ -91,10 +93,39 @@ __attribute__((weak)) uint32_t __getTime(void)
 {
     return (__mscount + (SYSTICK->LOAD - SYSTICK->VAL) / (PLL_N * 1000));
 }
+
 __attribute__((weak)) void SysTick_Handler()
 {
     __mscount += (SYSTICK->LOAD) / (PLL_N * 1000);
+
+    // // // TODO: add task switchng
+    extern uint32_t curr_task;
+    extern uint32_t next_task;
+    switch (curr_task) {
+    case(0):
+        next_task = 1;
+        break;
+    case(1):
+        next_task = 2;
+        break;
+    case(2):
+        next_task = 3;
+        break;
+    case(3):
+        next_task = 0;
+        break;
+    default:
+        next_task = 0;
+        break;
+    }
+
+    if (curr_task != next_task) { // Context switching needed
+        __SetPendSV();
+    }
+    // kprintf("%d %d ", curr_task, next_task);
+    return;
 }
+
 
 /**
  *  Enable FPU
@@ -431,3 +462,18 @@ void __disable_fault_irq(void) {
 void __enable_fault_irq(void) {
     asm volatile ("CPSIE F");
 }
+
+void __SetPendSV(void) {
+    SCB->ICSR |= (1 << 28);
+}
+// Clear PendSV Pending Bit
+void __ClearPendSV(void) {
+    SCB->ICSR |= (1 << 27);
+}
+
+__attribute__((naked)) void __set_control(uint32_t val)
+{
+    asm volatile ("MSR CONTROL, %0" : : "r" (val) : "memory");
+    asm volatile ("ISB");
+}
+
